@@ -1,0 +1,106 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{polski}
+\usepackage[polish]{babel}
+\usepackage{graphicx}
+
+\usetheme{Darmstadt}
+\useoutertheme[subsection=false]{miniframes}
+\makeatletter
+  \beamer@compressfalse
+\makeatother
+
+\title{Coinduction and topology:\\an unexpected connection}
+\author{Wojciech Kołowski}
+\date{17 June 2020}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\addtocontents{toc}{\setcounter{tocdepth}{1}}
+\frame{\tableofcontents}
+
+\section{Review and critique}
+
+\begin{frame}{Review of approaches to coinduction}
+\begin{itemize}
+	\item So far we have seen two approaches to coinduction and bisimulation:
+	\item The LTS approach, in which a coinductive process is (re)presented using a particular kind of machine. This machine can be in any of a number of states and can transition between them by performing an appropriate action.
+	\item The categorical approach, in which we are interested in coalgebras of endofunctors. In the final coalgebra $(\nu F, \textbf{unfold})$ the ``coinductively'' defined object is the carrier $\nu F$, and \textbf{unfold} takes the object apart, splitting into its constituent parts (it can also be seen as performing some observations on $\nu F$). Corecursion is a consequence of finality.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The LTS approach: a critique 1/2}
+\begin{itemize}
+	\item I think that the LTS approach to coinduction and bisimulation is quite bad from the explanatory point of view, for a few reasons:
+	\item First, it obscures the very important duality between induction and coinduction, which everybody wants to learn about instantly upon seeing the name ``coinduction''.
+	\item Interlude: the right notion of equality for LTSes is of course graph isomorphism, as they are nothing more than labeled graphs -- static, immobile objects that prescribe actions and transitions, but don't act and don't transition.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The LTS approach: a critique 2/2}
+\begin{itemize}
+	\item Second, the idea of bisimulation is a bit ad hoc and circular.
+	\item Bisimulation was advised in the book as the right notion of behavioural equality of LTSes, but it is in fact the right notion of equality for behaviours of LTSes. The behaviour of an LTS is its dynamic aspect -- where the actions and transitions take place.
+	\item However, to define it formally, we need coinduction (or else we will miss ``infinite'' phenomena). Thus, there is some kind of circularity in explaining coinduction using LTSes, even if only conceptual.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The categorical approach: a critique}
+\begin{itemize}
+	\item The categorical approach is much better, as it makes the duality between induction and coinduction more explicit and also doesn't give the false impression that coinduction is about automata.
+	\item However, it is not without faults:
+	\item By using the machinery of category theory it makes coinduction seem more magical and arcane than it really is. It is unlikely to be enlightening to ordinary programmers and people with category theory disability.
+	\item It makes the operational and computational aspects of corecursion less explicit.
+	\item It does not provide a nice syntax/notation for corecursive definitions (even though it does provide $\nu X. F(X)$ for objects) -- and that's very important! ``Notation is the tool of thought'', they say. 
+\end{itemize}
+\end{frame}
+
+\section{Coinduction in type theory}
+
+\begin{frame}{The duality}
+\begin{tabular}{ p{3cm} | p{3cm} | p{3cm} }
+	Feature & induction & coinduction \\\hline
+	shape & sum of products & product of sums \\\hline
+	polarity & positive & negative \\\hline
+	basic activity & construction & deconstruction (observation) \\\hline
+	derived activity & deconstruction (observation) & construction \\\hline
+	tree width & any & any \\\hline
+	tree height & necessarily finite & possibly infinite \\\hline
+	evaluation & possibly eager & necessarily lazy \\\hline
+	easy to define functions with & inductive domain & coinductive codomain \\\hline
+	every step & shrinks the principal argument & grows the result
+\end{tabular}
+\end{frame}
+
+
+%1. Nazwana suma (niezależna) produktów (zależnych).
+%2. Typy pozytywne - zdeterminowane przez konstruktory.
+%3. Byty skończone - nie da się w skończonym czasie zbudować czegoś nieskończonego
+%4. Ewaluacja gorliwa - robimy, bo możemy
+%5. Wystąpienia rekurencyjne w definicjach typów ind. muszą być ściśle pozytywne.
+%6. Rekursja strukturalna pozwala definiować funkcje o typach I -> X
+%7. Wywołania rekurencyjne zmniejszają argument główny, co zapewnia terminację.
+%8. Indukcja strukturalna: funkcje o typach forall i : I, P i
+
+%# Koindukcja
+%1. Nazwany produkt (zależny) sum (zależnych).
+%2. Typy negatywne - zdeterminowane przez dekonstruktory.
+%3. Byty potencjalnie nieskończone - można w skończonym czasie opisać sposób dekonstrukcji nieskończonej struktury.
+%4. Ewaluacja leniwa - robimy, bo musimy.
+%5. Wystąpienia korekurencyjne w definicjach typów ind. muszą być ściśle pozytywne.
+%6. Korekursja strukturalna pozwala definiować funkcje o typach X -> C
+%7. Wywołania korekurencyjne muszą powiększać wynik, czyli muszą być produktywne.
+%8. Koindukcja strukturalna: nie ma w Coqu, ale jej odpowiednikiem jest najprawdopodobniej bipodobieństwo = równość (patrz prace chyba Setzera).
+
+\section{Finite, infinite and searchable types}
+
+\begin{frame}{}
+\begin{itemize}
+	\item 
+\end{itemize}
+\end{frame}
+
+\end{document}
