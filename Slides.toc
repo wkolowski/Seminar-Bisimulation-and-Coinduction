@@ -1,5 +1,0 @@
-\babel@toc {polish}{}
-\global \c@tocdepth 1\relax 
-\beamer@sectionintoc {1}{Review and critique}{3}{0}{1}
-\beamer@sectionintoc {2}{Coinduction in type theory}{7}{0}{2}
-\beamer@sectionintoc {3}{Finite, infinite and searchable types}{8}{0}{3}

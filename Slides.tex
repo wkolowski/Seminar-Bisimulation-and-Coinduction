@@ -4,22 +4,17 @@
 \usepackage{polski}
 \usepackage[polish]{babel}
 \usepackage{graphicx}
+\usepackage{minted}
 
-\usetheme{Darmstadt}
-\useoutertheme[subsection=false]{miniframes}
-\makeatletter
-  \beamer@compressfalse
-\makeatother
-
-\title{Coinduction and topology:\\an unexpected connection}
+\title{Coinduction and topology:\\an (un)expected connection}
 \author{Wojciech Kołowski}
 \date{17 June 2020}
+
+\usetheme{Darmstadt}
 
 \begin{document}
 
 \frame{\titlepage}
-
-\addtocontents{toc}{\setcounter{tocdepth}{1}}
 \frame{\tableofcontents}
 
 \section{Review and critique}
@@ -28,7 +23,7 @@
 \begin{itemize}
 	\item So far we have seen two approaches to coinduction and bisimulation:
 	\item The LTS approach, in which a coinductive process is (re)presented using a particular kind of machine. This machine can be in any of a number of states and can transition between them by performing an appropriate action.
-	\item The categorical approach, in which we are interested in coalgebras of endofunctors. In the final coalgebra $(\nu F, \textbf{unfold})$ the ``coinductively'' defined object is the carrier $\nu F$, and \textbf{unfold} takes the object apart, splitting into its constituent parts (it can also be seen as performing some observations on $\nu F$). Corecursion is a consequence of finality.
+	\item The categorical approach, in which we are interested in coalgebras of endofunctors. In the final coalgebra $(\nu F, \alpha)$ the ``coinductively'' defined object is the carrier $\nu F$, and $\alpha$ takes the object apart, splitting into its constituent parts (it can also be seen as performing some observations on $\nu F$). Corecursion is a consequence of finality.
 \end{itemize}
 \end{frame}
 
@@ -43,7 +38,7 @@
 \begin{frame}{The LTS approach: a critique 2/2}
 \begin{itemize}
 	\item Second, the idea of bisimulation is a bit ad hoc and circular.
-	\item Bisimulation was advised in the book as the right notion of behavioural equality of LTSes, but it is in fact the right notion of equality for behaviours of LTSes. The behaviour of an LTS is its dynamic aspect -- where the actions and transitions take place.
+	\item Bisimulation was advertised in the book as the right notion of behavioural equality of LTSes, but it is in fact the right notion of equality for behaviours of LTSes. The behaviour of an LTS is its dynamic aspect -- where the actions and transitions take place.
 	\item However, to define it formally, we need coinduction (or else we will miss ``infinite'' phenomena). Thus, there is some kind of circularity in explaining coinduction using LTSes, even if only conceptual.
 \end{itemize}
 \end{frame}
@@ -61,8 +56,9 @@
 \section{Coinduction in type theory}
 
 \begin{frame}{The duality}
-\begin{tabular}{ p{3cm} | p{3cm} | p{3cm} }
-	Feature & induction & coinduction \\\hline
+\begin{tabular}{ | p{3cm} | p{3cm} | p{3cm} | }
+	\hline
+	feature $\downarrow$ & induction & coinduction \\\hline
 	shape & sum of products & product of sums \\\hline
 	polarity & positive & negative \\\hline
 	basic activity & construction & deconstruction (observation) \\\hline
@@ -71,8 +67,38 @@
 	tree height & necessarily finite & possibly infinite \\\hline
 	evaluation & possibly eager & necessarily lazy \\\hline
 	easy to define functions with & inductive domain & coinductive codomain \\\hline
-	every step & shrinks the principal argument & grows the result
+	every step & shrinks the principal argument & grows the result \\\hline
 \end{tabular}
+\end{frame}
+
+\begin{frame}{A comparatory example}
+\begin{itemize}
+	\item How does the duality play out in practice? Let's see an example in Coq!
+	\item The code for this example, named \texttt{Snippet1.v}, is available from the GitHub repo of this talk: \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{A comparatory example}
+\noindent
+\begin{minipage}[l]{0.45\linewidth}
+	\begin{minted}{Haskell}
+		data List a = Nil | Cons a (List a)
+
+		sum : List Int -> Int
+		sum Nil = 0
+		sum (Cons x xs) = x + sum xs
+	\end{minted}
+\end{minipage}
+\noindent
+\begin{minipage}[b]{0.45\linewidth}
+	\begin{minted}{Haskell}
+		data List a = Nil | Cons a (List a)
+
+		sum : List Int -> Int
+		sum Nil = 0
+		sum (Cons x xs) = x + sum xs
+	\end{minted}
+\end{minipage}
 \end{frame}
 
 
