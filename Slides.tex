@@ -39,7 +39,7 @@
 \begin{itemize}
 	\item Second, the idea of bisimulation is a bit ad hoc and circular.
 	\item Bisimulation was advertised in the book as the right notion of behavioural equality of LTSes, but it is in fact the right notion of equality for behaviours of LTSes. The behaviour of an LTS is its dynamic aspect -- where the actions and transitions take place.
-	\item However, to define it formally, we need coinduction (or else we will miss ``infinite'' phenomena). Thus, there is some kind of circularity in explaining coinduction using LTSes, even if only conceptual.
+	\item However, to formally define such a notion of behaviour, we need coinduction in the first place (or else we will miss ``infinite'' phenomena). Thus, there is some kind of circularity in explaining coinduction using LTSes, even if only conceptual.
 \end{itemize}
 \end{frame}
 
@@ -49,26 +49,57 @@
 	\item However, it is not without faults:
 	\item By using the machinery of category theory it makes coinduction seem more magical and arcane than it really is. It is unlikely to be enlightening to ordinary programmers and people with category theory disability.
 	\item It makes the operational and computational aspects of corecursion less explicit.
-	\item It does not provide a nice syntax/notation for corecursive definitions (even though it does provide $\nu X. F(X)$ for objects) -- and that's very important! ``Notation is the tool of thought'', they say. 
+	\item It does not provide a nice syntax/notation for corecursive definitions (even though it does provide $\nu X. F(X)$ for objects) -- and that's very important! ``Notation is the tool of thought'', they say.
 \end{itemize}
 \end{frame}
 
-\section{Coinduction in type theory}
+\section{An intuitive approach to coinduction}
+
+\begin{frame}{How to explain coinduction to 5 year olds}
+\begin{itemize}
+	\item I think that the most natural way of explaining coinduction is to refer to an informal version of the duality with induction and then present lots of examples and exercises to build the right intuitions.
+	\item So, let's do just that! 
+\end{itemize}
+\end{frame}
 
 \begin{frame}{The duality}
 \begin{tabular}{ | p{3cm} | p{3cm} | p{3cm} | }
 	\hline
 	feature $\downarrow$ & induction & coinduction \\\hline
-	shape & sum of products & product of sums \\\hline
-	polarity & positive & negative \\\hline
+	shape & sum (of products) & product (of sums) \\\hline
 	basic activity & construction & deconstruction (observation) \\\hline
 	derived activity & deconstruction (observation) & construction \\\hline
-	tree width & any & any \\\hline
-	tree height & necessarily finite & possibly infinite \\\hline
-	evaluation & possibly eager & necessarily lazy \\\hline
 	easy to define functions with & inductive domain & coinductive codomain \\\hline
-	every step & shrinks the principal argument & grows the result \\\hline
+	such that every (co)recursive call & shrinks the principal argument & grows the result \\\hline
+	thus these functions are & terminating & productive \\\hline
+	evaluation & possibly eager & necessarily lazy \\\hline
+	tree height & necessarily finite & possibly infinite \\\hline
+	tree width & any & any \\\hline
 \end{tabular}
+\end{frame}
+
+\begin{frame}{Some jargon}
+\begin{itemize}
+	\item The first four rows in the table can be restated in terms of category theory, logic and programmer's common sense.
+	\item In categorical terms it means that inductives have a ``mapping-out'' universal property, whereas coinductives have a ``mapping-in'' universal property.
+	\item In logical terms, we can say that inductives have positive polarity and coinductives have negative polarity.
+	\item For programmers this basically means that inductives are data (like that which can be found in databases), whereas coinductives are interactive processes (like operating systems or web servers).
+	
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Some intuitions}
+\begin{itemize}
+	\item This basically means that inductives are determined by ways of constructing their elements and the elimination principle is a derived notion whose purpose is to say ``the only things you can build come from the introduction principle(s) (constructors)''.
+	\item This basically means that coinductives are determined by ways of observing their elements and the introduction principle is a derived notion whose purpose is to say ``the only things you can observe come from the elimination principle(s)''.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Some examples}
+\begin{itemize}
+	\item The type \texttt{bool} is an inductive type with two constructors \texttt{true} and \texttt{false}. Knowing this we can derive an elimination principle, which amounts to an \texttt{if-then-else} construction (but dependently typed!).
+	\item Imagine a type of web servers that can only handle requests for pictures of funny cats (this is the elimination principle). Thus know there must be something in the web server that is responsible for handling these requests and the introduction principle consists of all the possible ways of constructing that thing.
+\end{itemize}
 \end{frame}
 
 \begin{frame}{A comparatory example}
@@ -78,7 +109,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{A comparatory example}
+\begin{frame}[fragile]{A comparatory example (informal)}
 \noindent
 \begin{minipage}[l]{0.45\linewidth}
 	\begin{minted}{Haskell}
@@ -101,12 +132,10 @@
 \end{minipage}
 \end{frame}
 
-
 %1. Nazwana suma (niezależna) produktów (zależnych).
 %2. Typy pozytywne - zdeterminowane przez konstruktory.
 %3. Byty skończone - nie da się w skończonym czasie zbudować czegoś nieskończonego
 %4. Ewaluacja gorliwa - robimy, bo możemy
-%5. Wystąpienia rekurencyjne w definicjach typów ind. muszą być ściśle pozytywne.
 %6. Rekursja strukturalna pozwala definiować funkcje o typach I -> X
 %7. Wywołania rekurencyjne zmniejszają argument główny, co zapewnia terminację.
 %8. Indukcja strukturalna: funkcje o typach forall i : I, P i
@@ -116,10 +145,13 @@
 %2. Typy negatywne - zdeterminowane przez dekonstruktory.
 %3. Byty potencjalnie nieskończone - można w skończonym czasie opisać sposób dekonstrukcji nieskończonej struktury.
 %4. Ewaluacja leniwa - robimy, bo musimy.
-%5. Wystąpienia korekurencyjne w definicjach typów ind. muszą być ściśle pozytywne.
 %6. Korekursja strukturalna pozwala definiować funkcje o typach X -> C
 %7. Wywołania korekurencyjne muszą powiększać wynik, czyli muszą być produktywne.
 %8. Koindukcja strukturalna: nie ma w Coqu, ale jej odpowiednikiem jest najprawdopodobniej bipodobieństwo = równość (patrz prace chyba Setzera).
+
+\section{Coinduction in type theory}
+
+
 
 \section{Finite, infinite and searchable types}
 
