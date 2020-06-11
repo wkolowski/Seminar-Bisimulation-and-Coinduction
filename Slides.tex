@@ -74,56 +74,57 @@
 	thus these functions are & terminating & productive \\\hline
 	evaluation & possibly eager & necessarily lazy \\\hline
 	tree height & necessarily finite & possibly infinite \\\hline
-	tree width & any & any \\\hline
+	% tree width & any & any \\\hline
 \end{tabular}
 \end{frame}
 
-\begin{frame}{Scary explanations}
+\begin{frame}{First half of the duality: Scary explanations}
 \begin{itemize}
-	\item The first four rows in the table can be restated in terms of category theory and logic/type theory
+	\item The first half of the table can be restated in terms of category theory and logic/type theory.
 	\item In categorical terms it means that inductives have a ``mapping-out'' universal property, i.e. they are colimits, whereas coinductives have a ``mapping-in'' universal property, i.e. they are limits.
 	\item In logical terms, we can say that inductives have positive polarity and coinductives have negative polarity. For nice explanations of polarity, see \url{https://existentialtype.wordpress.com/2012/08/25/polarity-in-type-theory/} and \url{http://noamz.org/talks/logpolpro.pdf}.
 	\item All of this can also be restated in less scary terms.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Intuitions for programmers}
+\begin{frame}{First half of the duality: Intuitions for programmers}
 \begin{itemize}
-	\item For programmers this basically means that inductives are data (like the stuff you can find in databases), whereas coinductives are interactive processes (like operating systems or web servers). This basically means that:
 	\item Inductives are determined by ways of constructing their elements and the elimination principle is a derived notion whose purpose is to say ``the only things you can build come from the introduction principles (constructors)''.
 	\item Coinductives are determined by ways of observing their elements and the introduction principle is a derived notion whose purpose is to say ``the only things you can observe come from the elimination principles''.
+	\item For programmers this basically means that inductives are data (similar to the stuff stored in databases), whereas coinductives are interactive processes (like operating systems or web servers).
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Examples for programmers}
+\begin{frame}{First half of the duality: Examples for programmers}
 \begin{itemize}
-	\item Examples for the verbiage from previous slide come in handy:
-	\item The type \texttt{bool} is an inductive type with two constructors \texttt{true} and \texttt{false}. Knowing this we can derive an elimination principle, which amounts to an \texttt{if-then-else} construction (but dependently typed!).
-	\item Imagine a type of web servers that can only handle requests for pictures of funny cats (this is the elimination principle). Thus we know that there must be something in the web server that is responsible for handling these requests and the introduction principle consists of all the possible ways of constructing that thing.
+	\item The type \texttt{bool} is an inductive type with two constructors \texttt{true} and \texttt{false}. Knowing this we can derive an elimination principle, which amounts to an \texttt{if-then-else} expression (but dependently typed!).
+	\item Imagine a type of web servers that can only handle requests for pictures of funny cats (this is the elimination principle). From this description we know that there must be something in the web server that is responsible for handling these requests and thus the derived introduction principle specifies all the possible ways of constructing that thing.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Philosophical points: laziness and strictness 1/2}
+\begin{frame}{Second half of the duality: laziness and strictness 1/2}
 \begin{itemize}
+	\item The second half of the duality is rather clear and doesn't need to be explained, but there are two philosophical points to be made. 
 	\item \textbf{Laziness and strictness are properties of types, not of languages}.
-	\item Therefore it does not make much sense to talk about lazy or stric languages.
 	\item Because coinductives are possibly infinite, they can't be evaluated eagerly and thus any language that incorporates them will have some form of lazy evaluation.
 	\item Inductives can be evaluated both lazily and eagerly, buth since they are data which is most often meant to be passed to some function for further processing, it makes more sense for them to be eager.
+	\item Therefore it does not make much sense to talk about lazy or stric languages.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Philosophical points: laziness and strictness 2/2}
+\begin{frame}{Second half of the duality: laziness and strictness 2/2}
 \begin{itemize}
 	\item An interesting case is the product type, which can be defined both inductively and coinductively.
 	\item Elements of inductive products are constructed by pairing two things. The derived eliminator says that we can pattern match on the pair to get them back and then use them to construct something else.
-	\item Elements of coinductives products are eliminated using projections. The derived introduction rule says that we must provide everything that can be projected out, so it is pairing too.
+	\item Elements of coinductive products are eliminated using projections. The derived introduction rule says that we must provide everything that can be projected out, so it is pairing too.
 	\item Both product types are isomorphic, but inductive products are best thought of as ``eager products'', whereas coinductive products are best thought of as ``lazy products''.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Philosophical points: termination and productivity 1/2}
 \begin{itemize}
-	\item In programmers' collective consciousness lives the idea a ``looping'' program, exemplified by infinite loops like \texttt{while(true) $\lbrace$...$\rbrace$} or an erroneous implementation of recursive factorial on integers with the base case missing.
+	\item In programmers' collective consciousness there is the idea of an ``infinite loop'' -- a bug that causes a program not to terminate.
+	\item  It got its name from loops like \texttt{while(true) $\lbrace$...$\rbrace$} or an erroneous implementation of recursive factorial on integers with the base case missing.
 	\item \textbf{It is a conflation of two more basic concepts: nontermination and nonproductivity.}
 \end{itemize}
 \end{frame}
@@ -138,7 +139,6 @@
 \begin{frame}{Philosophical points: termination and productivity 3/2}
 \begin{itemize}
 	\item To sum it up:
-	\item 
 \end{itemize}
 \end{frame}
 
