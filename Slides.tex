@@ -78,7 +78,7 @@
 \end{tabular}
 \end{frame}
 
-\begin{frame}{First half of the duality: Scary explanations}
+\begin{frame}{Explaining the first half of the duality}
 \begin{itemize}
 	\item The first half of the table can be restated in terms of category theory and logic/type theory.
 	\item In categorical terms it means that inductives have a ``mapping-out'' universal property, i.e. they are colimits, whereas coinductives have a ``mapping-in'' universal property, i.e. they are limits.
@@ -87,7 +87,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{First half of the duality: Intuitions for programmers}
+\begin{frame}{(Co)induction, (co)limits, positive and negative types 1/2}
 \begin{itemize}
 	\item Inductives are determined by ways of constructing their elements and the elimination principle is a derived notion whose purpose is to say ``the only things you can build come from the introduction principles (constructors)''.
 	\item Coinductives are determined by ways of observing their elements and the introduction principle is a derived notion whose purpose is to say ``the only things you can observe come from the elimination principles''.
@@ -95,24 +95,30 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{First half of the duality: Examples for programmers}
+\begin{frame}{(Co)induction, (co)limits, positive and negative types 2/2}
 \begin{itemize}
 	\item The type \texttt{bool} is an inductive type with two constructors \texttt{true} and \texttt{false}. Knowing this we can derive an elimination principle, which amounts to an \texttt{if-then-else} expression (but dependently typed!).
 	\item Imagine a type of web servers that can only handle requests for pictures of funny cats (this is the elimination principle). From this description we know that there must be something in the web server that is responsible for handling these requests and thus the derived introduction principle specifies all the possible ways of constructing that thing.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Second half of the duality: laziness and strictness 1/2}
+\begin{frame}{Explaining the second half of the duality}
 \begin{itemize}
-	\item The second half of the duality is rather clear and doesn't need to be explained, but there are two philosophical points to be made. 
-	\item \textbf{Laziness and strictness are properties of types, not of languages}.
-	\item Because coinductives are possibly infinite, they can't be evaluated eagerly and thus any language that incorporates them will have some form of lazy evaluation.
-	\item Inductives can be evaluated both lazily and eagerly, buth since they are data which is most often meant to be passed to some function for further processing, it makes more sense for them to be eager.
-	\item Therefore it does not make much sense to talk about lazy or stric languages.
+	\item The second half of the duality is quite clear and doesn't need to be demystified as much as the first, but there are two philosophical misconceptions to be addressed.
+	\item The first is about lazy and strict languages.
+	\item The second is about ``infinite loops''.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Second half of the duality: laziness and strictness 2/2}
+\begin{frame}{Laziness and strictness 1/3}
+\begin{itemize}
+	\item Inductives can be evaluated both lazily and eagerly, buth since they are data which is most often meant to be passed to some function for further processing, it makes more sense for them to be eager.
+	\item Because coinductives are possibly infinite, they can't be evaluated eagerly and thus any language that incorporates them will have some form of lazy evaluation.
+	\item We may think that inductive types are (or at least should) be ``eager'', whereas coinductive types are ``lazy''.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Laziness and strictness 2/3}
 \begin{itemize}
 	\item An interesting case is the product type, which can be defined both inductively and coinductively.
 	\item Elements of inductive products are constructed by pairing two things. The derived eliminator says that we can pattern match on the pair to get them back and then use them to construct something else.
@@ -121,24 +127,43 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Philosophical points: termination and productivity 1/2}
+\begin{frame}{Lazines and strictness 3/3}
 \begin{itemize}
-	\item In programmers' collective consciousness there is the idea of an ``infinite loop'' -- a bug that causes a program not to terminate.
-	\item  It got its name from loops like \texttt{while(true) $\lbrace$...$\rbrace$} or an erroneous implementation of recursive factorial on integers with the base case missing.
-	\item \textbf{It is a conflation of two more basic concepts: nontermination and nonproductivity.}
+	\item \textbf{Laziness and strictness are properties of types, not of languages}
+	\item Haskell is usually said to be a ``lazy language'', but in reality it's just that its types are lazy by default. Given some strictness annotations we can define strict types or even mixed strict-lazy types.
+	\item OCaml or StandardML are usually said to be ``strict'' languages, but it's just that their types are strict by default. We can make a type \texttt{'a} lazy by turning it into a function type with unit domain: \texttt{unit -> 'a}.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Philosophical points: termination and productivity 2/2}
+\begin{frame}{Termination and productivity 1/3}
 \begin{itemize}
-	\item Termination and nontermination pertain only to recursive functions. The purpose of such a function is to consume its input and produce some output. If the function keeps running forever, it means it has failed to achieve its goal. In this case ``looping'' is nontermination and it is evil.
-	\item Productivity is a property that only corecursive functions can possess. The purpose of such functions is, given some input, to keep producing output for as long as it is requested. If the function keeps running forever, it is not necessarily broken. After all, it may be the case that requests will never stop coming. In this case the evil thing is called ``nonproductivity'' and it happens when a functions hangs forever on answering a single request.
+	\item In programmers' collective consciousness there is the term ``infinite loop'', usually applied in two distinct situations.
+	\item Sometimes it looks like \texttt{while(true) $\lbrace$...$\rbrace$}. In such cases the infinite loop was programmed intentionally. Its purpose may be to, for example, implement a server that is waiting for requests.
+	\item Other times it looks like an ordinary loop, but the stopping condition will never be met. In such cases the infinite loop was programmed by mistake and thus is a bug.
+	\item This term would also be applied to describe an erroneous implementation of recursive factorial on integers with the base case missing, even though there isn't any kind of loop going on.
+	\item Note that this term is very one-sided -- terminating programs aren't called ``finite loops''.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Philosophical points: termination and productivity 3/2}
+\begin{frame}{Termination and productivity 2/3}
+\begin{itemize}
+	\item \textbf{The term ``infinite loop'' is considered harmful, because it conflates two separate notions: termination and productivity.}
+	\item Termination is a property that pertains only to recursive functions.
+	\item Each recursive call must shrink the input and may produce a part of the output.
+	\item Therefore all recursive functions terminate.
+	\item Productivity is a property that pertains only to corecursive functions.
+	\item Each corecursive call may do anything with the input and must produce a part of the output.
+	\item Therefore all corecursive functions are productive.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Termination and productivity 3/3}
 \begin{itemize}
 	\item To sum it up:
+	\item Bugged implementation of factorial on integers without the base case: recursive, nonterminating, not ok.
+	\item Correct implementation of factorial on natural numbers: recursive, terminating, ok.
+	\item Correct implementation of a web server that serves pictures of funny cats: corecursive, productive, ok.
+	\item A web server that hangs for some requests: corecursive, nonproductive, not ok.
 \end{itemize}
 \end{frame}
 
@@ -149,43 +174,12 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{A comparatory example (informal)}
-\noindent
-\begin{minipage}[l]{0.45\linewidth}
-	\begin{minted}{Haskell}
-		data List a = Nil | Cons a (List a)
-
-		sum : List Int -> Int
-		sum Nil = 0
-		sum (Cons x xs) = x + sum xs
-	\end{minted}
-\end{minipage}
-\noindent
-\begin{minipage}[b]{0.45\linewidth}
-	\begin{minted}{Haskell}
-		data List a = Nil | Cons a (List a)
-
-		sum : List Int -> Int
-		sum Nil = 0
-		sum (Cons x xs) = x + sum xs
-	\end{minted}
-\end{minipage}
-\end{frame}
-
-%Indukcja
-%1. Nazwana suma (niezależna) produktów (zależnych).
-%8. Indukcja strukturalna: funkcje o typach forall i : I, P i
-
-%# Koindukcja
-%1. Nazwany produkt (zależny) sum (zależnych).
-%3. Byty potencjalnie nieskończone - można w skończonym czasie opisać sposób dekonstrukcji nieskończonej struktury.
-%8. Koindukcja strukturalna: nie ma w Coqu, ale jej odpowiednikiem jest najprawdopodobniej bipodobieństwo = równość (patrz prace chyba Setzera).
-
 \section{Coinduction in type theory}
 
 \begin{frame}{Rescuing the duality}
 \begin{itemize}
-	\item 
+	\item Induction principle: \texttt{forall i : I, P i}
+	%8. Koindukcja strukturalna: nie ma w Coqu, ale jej odpowiednikiem jest najprawdopodobniej bipodobieństwo = równość (patrz prace chyba Setzera).
 \end{itemize}
 \end{frame}
 
@@ -193,7 +187,7 @@
 
 \begin{frame}{}
 \begin{itemize}
-	\item 
+	\item $\texttt{Searchable}(A) :\equiv \Pi p : A \to \mathbf{2}, \left(\Sigma x : A, p(x) = true\right) + \left(\Pi x : A, p(x) = false\right)$
 \end{itemize}
 \end{frame}
 
