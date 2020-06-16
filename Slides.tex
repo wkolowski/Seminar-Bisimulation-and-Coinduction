@@ -6,7 +6,7 @@
 \usepackage{graphicx}
 \usepackage{minted}
 
-\title{Coinduction and topology:\\an (un)expected connection}
+\title{Coinduction in type theory:\\a topological connection}
 \author{Wojciech Kołowski}
 \date{17 June 2020}
 
@@ -188,10 +188,66 @@
 
 \begin{frame}{A different look at the induction principle}
 \begin{itemize}
-	\item To rescue the duality, we have to squint at the induction principle and reformulate it in terms more amenable to being dualized.
-	\item We can split the induction principle into a recursion principle together with a uniqueness principle.
-	\item The recursion principle for naturals looks like this: \texttt{rec : forall X : Type, X -> (X -> X) -> nat -> X} such that these equations hold: \\ \texttt{rec X z s 0 = z} and \texttt{rec X z s (S n) = s (rec X z s n)}
-	\item The uniqueness principle looks like this: if we have a function \texttt{f} that satisfies the recursive equations \texttt{f 0 = z} and \texttt{f (S n) = s (f n)} for some \texttt{z : X} and \texttt{s : X -> X}, and a function \texttt{g} that also satisfies these equations, then \texttt{f = g}.
+	\item To rescue the duality, we have to squint at the induction principle and reformulate it in terms more amenable to being dualized -- we need to split it into a recursion principle and a uniqueness principle.
+	\item The recursion principle consists of the recursor \texttt{rec} and its computation rules: \\
+	\texttt{rec : forall X : Type, X -> (X -> X) -> nat -> X} \\
+	\texttt{uniq1 : rec X z s 0 = z} \\
+	\texttt{uniq2 : rec X z s (S n) = s (rec X z s n)}
+	\item The uniqueness principle looks like this: if a function \texttt{f} satisfies the equations \\
+	\texttt{f 0 = z} \\
+	\texttt{f (S n) = s (f n)} \\
+	for some \texttt{z : X} and \texttt{s : X -> X}, and a function \texttt{g} also satisfies them, then \texttt{forall x : X, f x = g x}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The coinduction principle}
+\begin{itemize}
+	\item We can now state the coinduction principle (for conatural numbers) and see the duality in full glory.
+	\item The corecursion principle: there is a corecursor \texttt{corec} that satisfies some equations: \\
+	\texttt{corec : forall X, (X -> option X) -> X -> conat} \\
+	\texttt{pred (corec X p x) =\\
+	match p x with \\
+	| None => None \\
+	| Some x' => Some (corec X p x') \\
+	end}
+	\item Given two functions \texttt{f} and \texttt{g} that satisfy the same corecursive equation as \texttt{corec X f}, we have \\
+	\texttt{forall x : X, f x = g x}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Meaning of the coinduction principle}
+\begin{itemize}
+	\item Meaning of the corecursor is quite clear -- it's for making functions into coinductives. But what is the (hidden) meaning of the uniqueness principle?
+	\item To understand it, we need to notice that, even though it is a statement about \textbf{functions} into coinductives, in reality it says something about equality of \textbf{elements} of coinductives.
+	\item For conatural numbers, it states that two numbers are equal if they both have equal predecessors, and their predecessors have equal predecessors and so on.
+	\item For streams, it would state that two streams are equal if they have equal heads and their tails have equal heads and so on.
+	\item So, the uniqueness principle states that bisimilar numbers/streams/structures are equal.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Induction, recursion, uniqueness}
+\begin{itemize}
+	\item The recursion and uniqueness principles are independent -- they can't be derived from each other.
+	\item They can, however, be derived from the induction principle -- to prove \texttt{forall i : I, f i = g i} where \texttt{I} is an inductive type, just use induction.
+	\item For each case in the induction, we have the appropriate equations and inductive hypotheses, so it is straightforward.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Coinduction, corecursion, uniqueness}
+\begin{itemize}
+	\item The corecursion and uniqueness principles are independent too.
+	\item However, because (in Coq) we only have the corecursion principle, we can't derive the uniqueness principle in any way.
+	\item How to prove \texttt{forall x : X, f x = g x}, for \texttt{f g : X -> C} and \texttt{C} coinductive?
+	\item Because the equality type is inductive, we can't use corecursion and because we don't know anything about \texttt{X}, we can't do anything with it.
+	\item Therefore we are stuck without the uniqueness principle. In Coq, we can't prove bisimilar objects equal without assuming axioms.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{How to get (co)inductive types?}
+\begin{itemize}
+	\item We saw in earlier talks that in set theory, coinductive definitions are not a basic concept and have to be derived from the ZF axioms. Inductives aren't basic either.
+	\item What's the situation in Coq and type theory in general?
+	\item In Coq, (co)inductives come from schematic definitions using the keywords \texttt{(Co)Inductive}. This means we can specify 
 \end{itemize}
 \end{frame}
 
