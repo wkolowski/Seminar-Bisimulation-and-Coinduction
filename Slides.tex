@@ -1,8 +1,8 @@
 \documentclass{beamer}
 
-\usepackage[utf8]{inputenc}
-\usepackage{polski}
-\usepackage[polish]{babel}
+%\usepackage[utf8]{inputenc}
+%\usepackage{polski}
+%\usepackage[polish]{babel}
 \usepackage{graphicx}
 \usepackage{minted}
 
@@ -73,9 +73,16 @@
 	such that every (co)recursive call & shrinks the principal argument & grows the result \\\hline
 	thus these functions are & terminating & productive \\\hline
 	evaluation & possibly eager & necessarily lazy \\\hline
-	tree height & necessarily finite & possibly infinite \\\hline
+	term height as tree & necessarily finite & possibly infinite \\\hline
 	% tree width & any & any \\\hline
 \end{tabular}
+\end{frame}
+
+\begin{frame}{A comparatory example}
+\begin{itemize}
+	\item How does the duality play out in practice? Let's see an example in Coq!
+	\item The code for this example, named \texttt{Duality.v}, is available from the GitHub repo of this talk: \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction}
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Explaining the first half of the duality}
@@ -167,13 +174,6 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{A comparatory example}
-\begin{itemize}
-	\item How does the duality play out in practice? Let's see an example in Coq!
-	\item The code for this example, named \texttt{Snippet1.v}, is available from the GitHub repo of this talk: \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction}
-\end{itemize}
-\end{frame}
-
 \section{Coinduction in type theory}
 
 \begin{frame}{A closer look at the duality}
@@ -243,21 +243,119 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{How to get (co)inductive types?}
+\begin{frame}{How to add (co)inductive types to type theory?}
 \begin{itemize}
 	\item We saw in earlier talks that in set theory, coinductive definitions are not a basic concept and have to be derived from the ZF axioms. Inductives aren't basic either.
 	\item What's the situation in Coq and type theory in general?
-	\item In Coq, (co)inductives come from schematic definitions using the keywords \texttt{(Co)Inductive}. This means we can specify 
+	\item There are three approaches that I'm aware of: schematic definitions, W-types/M-types and universes of codes.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Schematic definitions}
+\begin{itemize}
+	\item In Coq, (co)inductives come from schematic definitions using the keywords \texttt{(Co)Inductive}.
+	\item After issuing such a definition, appropriate rules for the defined type are added to the environment.
+	\item Pros: direct.
+	\item Cons: defining a (co)inductive type is a side effect! This can be seen in e.g. parameterized module in which we define a (co)inductive type. Then two modules defined by instantiating the parameters contain two copies of the same (co)inductive type which are different.
+	\item Another cons: schematic definitions are hard to formally describe and therefore they are usually found in implementations, not in papers.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{W-types, M-types}
+\begin{itemize}
+	\item Another approach to adding inductives/coinductives are the so called W-types/M-types respectively.
+	\item The idea is to add a single parameterized type \texttt{W} whose elements are well-founded trees.
+	\item The parameters control the shape of the trees -- the branching, types of non-recursive arguments etc. Particular inductive types can be recovered by instantiating \texttt{W} with the appropriate parameters.
+	\item The type \texttt{M} is dual to \texttt{W} and can be used to represent coinductives.
+	\item Pros: one ring to rule them all, simple to describe formally.
+	\item Cons: encodings using \texttt{W} and \texttt{M} have some overhead.
+	\item Cons: \texttt{W} and \texttt{M} are inherently higher-order, which means we need functional extensionality to prove things equal.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Universes of codes}
+\begin{itemize}
+	\item Another idea is to have an (inductive) type, whose elements are ``coes'', and a function that interprets these codes as real inductive/coinductive types.
+	\item This is basically a defunctionalization of \texttt{W} and \texttt{M}.
+	\item Pros: one ring to rule them all, first-order so no problems with functional extensionality, not an encoding.
+	\item Cons: harder to formally describe than \texttt{W} and \texttt{M}.
+	\item See the paper ``The gentle art of levitation'' for more: \url{http://jmchapman.io/papers/levitation.pdf}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Snippet}
+\begin{itemize}
+	\item Code snippets that illustrate how schematic definitions are side-effecting and how the definitions of \texttt{W} and \texttt{M} look like can be found in the file \texttt{SchematicWM.v}.
 \end{itemize}
 \end{frame}
 
 \section{Finite, infinite and searchable types}
 
-\begin{frame}{}
+\begin{frame}{Drinker's paradox}
 \begin{itemize}
-	\item $\displaystyle \texttt{Searchable}(A) :\equiv \prod_{p : A \to \mathbf{2}} \left(\sum_{x : A} p(x) = true\right) + \left(\prod_{x : A} p(x) = false\right)$
-	\item Intuition: we can find an element satisfying the boolean predicate $p$ or get a proof that it doesn't exist.
+	\item There's this well-known theorem of classical logic:
+	\item \textbf{In every non-empty bar, there is a person such that if this person drinks, then everybody drinks.}
+	\item This is usually presented to first-year students to make them confuse if-then implication with if-then causality.
+	\item If we change rewrite $P \to Q$ as $\neg P \lor Q$, the theorem gets demystified: \textbf{in every nonempty bar there is a person that does not drink or everybody drinks.}
+	\item An algorithmically-minded person might wonder: how to find such a person? Is it even possible? After all, the bar may be infinite!
+	\item But remember that we are using classical logic -- we can find him using the Law of Excluded Middle.
+	\item How does this translate to constructive logic and functional programming?
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Searchable types}
+\begin{center}
+	$\displaystyle \texttt{Searchable}(A) :\equiv \prod_{p : A \to \mathbf{2}} \left(\sum_{x : A} p(x) = true\right) + \left(\prod_{x : A} p(x) = false\right)$
+\end{center}
+\begin{itemize}
+	\item A type that satisfies the drinker's paradox statement is called \textbf{searchable}.
+	\item Spelled out explicitly: a type is searchable if, given any boolean predicate, we can either find an element that satisfies it or prove that there is no such element.
+	\item Drinker's Paradox says that in classical logic all types are searchable. But which types are searchable constructively?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Interlude: why should we care?}
+\begin{itemize}
+	\item Maybe you're wondering why you should care about searchable types.
+	\item Besides their evident utility when you're looking for something, there's a very nice theorem that may convince you.
+\end{itemize}
+\begin{theorem}
+	Let $A$ and $B$ be types. If $A$ is searchable and $B$ has decidable equality, then the function type $A \to B$ has decidable equality.
+\end{theorem}
+\begin{proof}
+	We have $f, g : A \to B$. To decide whether $f = g$ just search the domain $A$ for an $x : A$ that satisfies $f(x) \neq g(x)$. If you find one, $f \neq g$. Otherwise, $f = g$ (assuming functional extensionality)
+\end{proof}
+\end{frame}
+
+\begin{frame}{Which types are searchable?}
+\begin{itemize}
+	\item So, which types are searchable?
+	\item Certainly every finite type is searchable -- just check every element.
+	\item If $A$ and $B$ are searchable, so are $A + B$ and $A \times B$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Which types are not searchable?}
+\begin{itemize}
+	\item On the other hand, there are some types which should not be searchable, unless we assume excluded middle.
+	\item The most prominent such type is $\mathbb{N}$. We should have a strong feeling that it's impossible to search infinitely many elements in finite time.
+	\item So, without excluded middle we can't prove that infinite types are searchable, right?
+	\item \textbf{It turns out not.}
+	\item Whether a type is searchable depends not only on the number of elements, but also on how the type is laid out as a space.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Searchability of the conaturals}
+\begin{itemize}
+	\item The most prominent infinite type that is searchable are the conatural numbers (like natural numbers, but defined coinductively).
+	\item A snippet with a Coq proof of their searchability is named \texttt{Searchability.v}
+	\item It is based on the paper \url{https://www.cs.bham.ac.uk/~mhe/papers/omniscient-journal-revised.pdf}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exercises}
+\begin{itemize}
+	\item TODO
+\end{itemize}
+\end{frame}
 \end{document}
