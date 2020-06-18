@@ -1,11 +1,5 @@
 \documentclass{beamer}
 
-%\usepackage[utf8]{inputenc}
-%\usepackage{polski}
-%\usepackage[polish]{babel}
-\usepackage{graphicx}
-\usepackage{minted}
-
 \title{Coinduction in type theory:\\a topological connection}
 \author{Wojciech Kołowski}
 \date{17 June 2020}
@@ -74,14 +68,13 @@
 	thus these functions are & terminating & productive \\\hline
 	evaluation & possibly eager & necessarily lazy \\\hline
 	term height as tree & necessarily finite & possibly infinite \\\hline
-	% tree width & any & any \\\hline
 \end{tabular}
 \end{frame}
 
 \begin{frame}{A comparatory example}
 \begin{itemize}
 	\item How does the duality play out in practice? Let's see an example in Coq!
-	\item The code for this example, named \texttt{Duality.v}, is available from the GitHub repo of this talk: \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction}
+	\item The code snippet with this example, named \texttt{Duality.v}, is available from the GitHub repo of this talk: \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction}
 \end{itemize}
 \end{frame}
 
@@ -180,7 +173,7 @@
 \begin{itemize}
 	\item Earlier we said that for an inductive type $I$ it's easy to define functions of type $I \to X$, whereas for a coinductive type $C$ it's easy to define functions $X \to C$.
 	\item The induction principle for \texttt{nat} looks like this (in Coq): \texttt{forall P : nat -> Type, \\ P 0 -> (forall n : nat, P n -> P (S n)) -> \\ forall n : nat, P n}
-	\item The corecursion principle for \texttt{conat} looks like this (in Coq): \texttt{forall X : Type, (X -> option X) -> conat}
+	\item The corecursion principle for \texttt{conat} looks like this (in Coq): \texttt{forall X : Type, (X -> option X) -> X -> conat}
 	\item The first trouble lies in names: ``induction principle'' vs ``corecursion principle''. Where is the coinduction principle?
 	\item The second trouble lies in the strong assymmetry between the two principles: they look nothing like each other's mirror images.
 \end{itemize}
@@ -229,7 +222,7 @@
 \begin{itemize}
 	\item The recursion and uniqueness principles are independent -- they can't be derived from each other.
 	\item They can, however, be derived from the induction principle -- to prove \texttt{forall i : I, f i = g i} where \texttt{I} is an inductive type, just use induction.
-	\item For each case in the induction, we have the appropriate equations and inductive hypotheses, so it is straightforward.
+	\item For each case in the proof, we have the appropriate equations and inductive hypotheses, so it is straightforward.
 \end{itemize}
 \end{frame}
 
@@ -275,7 +268,7 @@
 
 \begin{frame}{Universes of codes}
 \begin{itemize}
-	\item Another idea is to have an (inductive) type, whose elements are ``coes'', and a function that interprets these codes as real inductive/coinductive types.
+	\item Another idea is to have an (inductive) type, whose elements are ``codes'', and a function that interprets these codes as real inductive/coinductive types.
 	\item This is basically a defunctionalization of \texttt{W} and \texttt{M}.
 	\item Pros: one ring to rule them all, first-order so no problems with functional extensionality, not an encoding.
 	\item Cons: harder to formally describe than \texttt{W} and \texttt{M}.
@@ -296,8 +289,8 @@
 	\item There's this well-known theorem of classical logic:
 	\item \textbf{In every non-empty bar, there is a person such that if this person drinks, then everybody drinks.}
 	\item This is usually presented to first-year students to make them confuse if-then implication with if-then causality.
-	\item If we change rewrite $P \to Q$ as $\neg P \lor Q$, the theorem gets demystified: \textbf{in every nonempty bar there is a person that does not drink or everybody drinks.}
-	\item An algorithmically-minded person might wonder: how to find such a person? Is it even possible? After all, the bar may be infinite!
+	\item If we rewrite $P \to Q$ as $\neg P \lor Q$, the theorem gets demystified: \textbf{in every nonempty bar there is a person that does not drink or everybody drinks.}
+	\item An algorithmically-minded person might wonder: how to find the (non)drinker? Is it even possible? After all, the bar may be infinite!
 	\item But remember that we are using classical logic -- we can find him using the Law of Excluded Middle.
 	\item How does this translate to constructive logic and functional programming?
 \end{itemize}
@@ -340,7 +333,7 @@
 	\item On the other hand, there are some types which should not be searchable, unless we assume excluded middle.
 	\item The most prominent such type is $\mathbb{N}$. We should have a strong feeling that it's impossible to search infinitely many elements in finite time.
 	\item So, without excluded middle we can't prove that infinite types are searchable, right?
-	\item \textbf{It turns out not.}
+	\item \textbf{Yes we can (sometimes).}
 	\item Whether a type is searchable depends not only on the number of elements, but also on how the type is laid out as a space.
 \end{itemize}
 \end{frame}
@@ -353,9 +346,19 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Exercises}
+\begin{frame}{Exercises 1/2}
 \begin{itemize}
-	\item TODO
+	\item Ex. 1: remove the axiom \texttt{sim\_eq} from my Coq proof of searchability of the conaturals and prove a lemma to fill the hole.
+	\item Ex. 2: define a type of streams, its bisimilarity relation and its corecursion principle. Then prove that the uniqueness principle implies that bisimilar streams are equal.
+	\item Ex. 3: define the bisimilarity relation of \texttt{M}-types. Encode streams using \texttt{M}-types. Prove that the types of normal streams and \texttt{M}-encoded streams are isomorphic (i.e. there are functions going both ways, such that the composition result is bisimilar to the argument).
 \end{itemize}
 \end{frame}
+
+\begin{frame}{Exercises 2/2}
+\begin{itemize}
+	\item Ex. 4: for a type $A$ its subtypes can be represented by the type $\displaystyle \sum_{x : A} P(x)$ where $P : A \to \text{Prop}$ is a predicate. Are subtypes of searchable types searchable? If yes, give a Coq proof. If not, give a counterexample and find a notion of subtype such that subtypes of searchable types are searchable.
+	\item Grading: all or nothing. These exercises were designed to look very scary but in fact they are very easy :)
+\end{itemize}
+\end{frame}
+
 \end{document}

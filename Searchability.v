@@ -132,29 +132,3 @@ Proof.
           apply le_omega_l in Hpn'. apply sim_eq in Hpn'. subst.
           congruence.
 Defined.
-
-Ltac inv H := inversion H; subst.
-
-Lemma no_axiom :
-  forall n m : conat,
-    sim n omega -> le n m -> sim m omega.
-Proof.
-  cofix CH.
-  intros n m Hsim Hle.
-  destruct Hle as [[]].
-    destruct Hsim as [[]].
-      destruct H0. inversion H1.
-      destruct H0 as (n' & m' & H1 & H2). congruence.
-    destruct H as (n' & m' & H1 & H2 & H3).
-      constructor. right. exists m', omega. split.
-        assumption.
-        split.
-          cbn. reflexivity.
-          apply CH with n'.
-            destruct Hsim as [[]].
-              destruct H. congruence.
-              destruct H as (n'' & m'' & H1' & H2' & H3').
-                cbn in H2'. inv H2'. rewrite H1' in H1. inv H1.
-                  assumption.
-            assumption.
-Qed.
