@@ -16,8 +16,8 @@
 \begin{frame}{Review of approaches to coinduction}
 \begin{itemize}
 	\item So far we have seen two approaches to coinduction and bisimulation:
-	\item The LTS approach, in which a coinductive process is (re)presented using a particular kind of machine. This machine can be in any of a number of states and can transition between them by performing an appropriate action.
-	\item The categorical approach, in which we are interested in coalgebras of endofunctors. In the final coalgebra $(\nu F, \alpha)$ the ``coinductively'' defined object is the carrier $\nu F$, and $\alpha$ takes the object apart, splitting into its constituent parts (it can also be seen as performing some observations on $\nu F$). Corecursion is a consequence of finality.
+	\item The LTS approach, in which coinductive processes are (re)presented using a particular kind of machine. This machine can be in any of a number of states and can transition between states by performing an action.
+	\item The categorical approach, in which we are interested in coalgebras of endofunctors. In the final coalgebra $(\nu F, \alpha)$ the ``coinductively'' defined object is the carrier $\nu F$, and $\alpha$ takes the object apart, splitting it into its constituent parts (it can also be seen as performing some observations on $\nu F$). Corecursion is a consequence of finality.
 \end{itemize}
 \end{frame}
 
@@ -32,7 +32,7 @@
 \begin{frame}{The LTS approach: a critique 2/2}
 \begin{itemize}
 	\item Second, the idea of bisimulation is a bit ad hoc and circular.
-	\item Bisimulation was advertised in the book as the right notion of behavioural equality of LTSes, but it is in fact the right notion of equality for behaviours of LTSes. The behaviour of an LTS is its dynamic aspect -- where the actions and transitions take place.
+	\item Bisimulation was advertised in the book as the right notion of behavioural equality for LTSes, but it is in fact the right notion of equality for behaviours of LTSes. The behaviour of an LTS is its dynamic aspect -- where the actions and transitions take place.
 	\item However, to formally define such a notion of behaviour, we need coinduction in the first place (or else we will miss ``infinite'' phenomena). Thus, there is some kind of circularity in explaining coinduction using LTSes, even if only conceptual.
 \end{itemize}
 \end{frame}
@@ -122,7 +122,7 @@
 \begin{itemize}
 	\item An interesting case is the product type, which can be defined both inductively and coinductively.
 	\item Elements of inductive products are constructed by pairing two things. The derived eliminator says that we can pattern match on the pair to get them back and then use them to construct something else.
-	\item Elements of coinductive products are eliminated using projections. The derived introduction rule says that we must provide everything that can be projected out, so it is pairing too.
+	\item Elements of coinductive products are eliminated using projections. The derived introduction rule says that we must provide everything that can be projected out, so it too amounts to pairing.
 	\item Both product types are isomorphic, but inductive products are best thought of as ``eager products'', whereas coinductive products are best thought of as ``lazy products''.
 \end{itemize}
 \end{frame}
@@ -163,7 +163,7 @@
 	\item Bugged implementation of factorial on integers without the base case: recursive, nonterminating, not ok.
 	\item Correct implementation of factorial on natural numbers: recursive, terminating, ok.
 	\item Correct implementation of a web server that serves pictures of funny cats: corecursive, productive, ok.
-	\item A web server that hangs for some funny cat requests: corecursive, nonproductive, not ok.
+	\item A web server that hangs for requests of funny cat pictures in which the cat is upside-down: corecursive, nonproductive, not ok.
 \end{itemize}
 \end{frame}
 
@@ -184,8 +184,8 @@
 	\item To rescue the duality, we have to squint at the induction principle and reformulate it in terms more amenable to being dualized -- we need to split it into a recursion principle and a uniqueness principle.
 	\item The recursion principle consists of the recursor \texttt{rec} and its computation rules: \\
 	\texttt{rec : forall X : Type, X -> (X -> X) -> nat -> X} \\
-	\texttt{uniq1 : rec X z s 0 = z} \\
-	\texttt{uniq2 : rec X z s (S n) = s (rec X z s n)}
+	\texttt{rec\_eq1 : rec X z s 0 = z} \\
+	\texttt{rec\_eq2 : rec X z s (S n) = s (rec X z s n)}
 	\item The uniqueness principle looks like this: if a function \texttt{f} satisfies the equations \\
 	\texttt{f 0 = z} \\
 	\texttt{f (S n) = s (f n)} \\
@@ -196,14 +196,15 @@
 \begin{frame}{The coinduction principle}
 \begin{itemize}
 	\item We can now state the coinduction principle (for conatural numbers) and see the duality in full glory.
-	\item The corecursion principle: there is a corecursor \texttt{corec} that satisfies some equations: \\
+	\item The corecursion principle: there is a corecursor \\
 	\texttt{corec : forall X, (X -> option X) -> X -> conat} \\
+	and it satisfies some equations: \\
 	\texttt{pred (corec X p x) =\\
 	match p x with \\
 	| None => None \\
 	| Some x' => Some (corec X p x') \\
 	end}
-	\item Given two functions \texttt{f} and \texttt{g} that satisfy the same corecursive equation as \texttt{corec X f}, we have \\
+	\item Given two functions \texttt{f} and \texttt{g} that satisfy the same corecursive equation as \texttt{corec X p}, we have \\
 	\texttt{forall x : X, f x = g x}.
 \end{itemize}
 \end{frame}
@@ -221,17 +222,17 @@
 \begin{frame}{Induction, recursion, uniqueness}
 \begin{itemize}
 	\item The recursion and uniqueness principles are independent -- they can't be derived from each other.
-	\item They can, however, be derived from the induction principle -- to prove \texttt{forall i : I, f i = g i} where \texttt{I} is an inductive type, just use induction.
-	\item For each case in the proof, we have the appropriate equations and inductive hypotheses, so it is straightforward.
+	\item They can, however, be derived from the induction principle: the recursion principle is a non-dependent special case of the induction principle and the uniqueness principle can be easily proved by using the appropriate equations and induction hypotheses.
+	\item Likewise, the induction principle can be derived when we have both the recursion principle and the uniqueness principle, but the proof is a bit more involved.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Coinduction, corecursion, uniqueness}
 \begin{itemize}
-	\item The corecursion and uniqueness principles are independent too.
-	\item However, because (in Coq) we only have the corecursion principle, we can't derive the uniqueness principle in any way.
+	\item The corecursion and uniqueness principles are independent too. When considered together, they can be thought of as the coinduction principle.
+	\item Therefore in Coq, because we only have the corecursion principle, we can't derive the uniqueness principle in any way.
 	\item How to prove \texttt{forall x : X, f x = g x}, for \texttt{f g : X -> C} and \texttt{C} coinductive?
-	\item Because the equality type is inductive, we can't use corecursion and because we don't know anything about \texttt{X}, we can't do anything with it.
+	\item Because the equality type is inductive, we can't use corecursion and because we don't know anything about \texttt{X}, we can't do anything with it either.
 	\item Therefore we are stuck without the uniqueness principle. In Coq, we can't prove bisimilar objects equal without assuming axioms.
 \end{itemize}
 \end{frame}
@@ -246,10 +247,10 @@
 
 \begin{frame}{Schematic definitions}
 \begin{itemize}
-	\item In Coq, (co)inductives come from schematic definitions using the keywords \texttt{(Co)Inductive}.
+	\item In Coq, (co)inductives come from schematic definitions using the keyword \texttt{(Co)Inductive}.
 	\item After issuing such a definition, appropriate rules for the defined type are added to the environment.
 	\item Pros: direct.
-	\item Cons: defining a (co)inductive type is a side effect! This can be seen in e.g. parameterized module in which we define a (co)inductive type. Then two modules defined by instantiating the parameters contain two copies of the same (co)inductive type which are different.
+	\item Cons: defining a (co)inductive type is a side effect! This can be seen e.g. in a parameterized module in which we define a (co)inductive type. Then two modules defined by instantiating the parameters contain two copies of the same (co)inductive type which are different.
 	\item Another cons: schematic definitions are hard to formally describe and therefore they are usually found in implementations, not in papers.
 \end{itemize}
 \end{frame}
@@ -259,10 +260,10 @@
 	\item Another approach to adding inductives/coinductives are the so called W-types/M-types respectively.
 	\item The idea is to add a single parameterized type \texttt{W} whose elements are well-founded trees.
 	\item The parameters control the shape of the trees -- the branching, types of non-recursive arguments etc. Particular inductive types can be recovered by instantiating \texttt{W} with the appropriate parameters.
-	\item The type \texttt{M} is dual to \texttt{W} and can be used to represent coinductives.
+	\item The type \texttt{M} is dual to \texttt{W} and can be used to represent coinductives. Its elements are possibly non-well-founded trees.
 	\item Pros: one ring to rule them all, simple to describe formally.
 	\item Cons: encodings using \texttt{W} and \texttt{M} have some overhead.
-	\item Cons: \texttt{W} and \texttt{M} are inherently higher-order, which means we need functional extensionality to prove things equal.
+	\item Cons: \texttt{W} and \texttt{M} are inherently higher-order, which means we need functional extensionality when doing equality proofs.
 \end{itemize}
 \end{frame}
 
@@ -289,8 +290,8 @@
 	\item There's this well-known theorem of classical logic:
 	\item \textbf{In every non-empty bar, there is a person such that if this person drinks, then everybody drinks.}
 	\item This is usually presented to first-year students to make them confuse if-then implication with if-then causality.
-	\item If we rewrite $P \to Q$ as $\neg P \lor Q$, the theorem gets demystified: \textbf{in every nonempty bar there is a person that does not drink or everybody drinks.}
-	\item An algorithmically-minded person might wonder: how to find the (non)drinker? Is it even possible? After all, the bar may be infinite!
+	\item If we rewrite $P \to Q$ as $\neg P \lor Q$, the theorem gets demystified: \textbf{in every non-empty bar there is a person that does not drink or everybody drinks.}
+	\item An algorithmically-minded person might wonder: how to find the non-drinker? Is it even possible? After all, the bar may be infinite!
 	\item But remember that we are using classical logic -- we can find him using the Law of Excluded Middle.
 	\item How does this translate to constructive logic and functional programming?
 \end{itemize}
@@ -331,9 +332,9 @@
 \begin{frame}{Which types are not searchable?}
 \begin{itemize}
 	\item On the other hand, there are some types which should not be searchable, unless we assume excluded middle.
-	\item The most prominent such type is $\mathbb{N}$. We should have a strong feeling that it's impossible to search infinitely many elements in finite time.
+	\item The most prominent such type is $\mathbb{N}$. We should have a strong feeling that it's impossible to search its infinitely many elements in finite time.
 	\item So, without excluded middle we can't prove that infinite types are searchable, right?
-	\item \textbf{Yes we can (sometimes).}
+	\item \textbf{Yes, we can (sometimes).}
 	\item Whether a type is searchable depends not only on the number of elements, but also on how the type is laid out as a space.
 \end{itemize}
 \end{frame}
@@ -356,7 +357,7 @@
 
 \begin{frame}{Exercises 2/2}
 \begin{itemize}
-	\item Ex. 4: for a type $A$ its subtypes can be represented by the type $\displaystyle \sum_{x : A} P(x)$ where $P : A \to \text{Prop}$ is a predicate. Are subtypes of searchable types searchable? If yes, give a Coq proof. If not, give a counterexample and find a notion of subtype such that subtypes of searchable types are searchable.
+	\item Ex. 4: for a type $A$ its subtypes can be represented by the type $\displaystyle \sum_{x : A} P(x)$ where $P : A \to \text{Prop}$ is a predicate. Are subtypes of searchable types searchable? If yes, give a Coq proof. If not, give a counterexample and find a different notion of subtype for which subtypes of searchable types are searchable.
 	\item Grading: all or nothing. These exercises were designed to look very scary but in fact they are very easy :)
 \end{itemize}
 \end{frame}
