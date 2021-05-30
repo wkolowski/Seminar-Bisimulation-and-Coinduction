@@ -172,8 +172,8 @@
 \begin{frame}{A closer look at the duality}
 \begin{itemize}
 	\item Earlier we said that for an inductive type $I$ it's easy to define functions of type $I \to X$, whereas for a coinductive type $C$ it's easy to define functions $X \to C$.
-	\item The induction principle for \texttt{nat} looks like this (in Coq): \texttt{forall P : nat -> Type, \\ P 0 -> (forall n : nat, P n -> P (S n)) -> \\ forall n : nat, P n}
-	\item The corecursion principle for \texttt{conat} looks like this (in Coq): \texttt{forall X : Type, (X -> option X) -> X -> conat}
+	\item The induction principle for \texttt{nat} looks like this (in Coq): \texttt{forall P :\ nat -> Type, \\ P 0 -> (forall n :\ nat, P n -> P (S n)) -> \\ forall n :\ nat, P n}
+	\item The corecursion principle for \texttt{conat} looks like this (in Coq): \texttt{forall X :\ Type, (X -> option X) -> X -> conat}
 	\item The first trouble lies in names: ``induction principle'' vs ``corecursion principle''. Where is the coinduction principle?
 	\item The second trouble lies in the strong assymmetry between the two principles: they look nothing like each other's mirror images.
 \end{itemize}
@@ -183,13 +183,13 @@
 \begin{itemize}
 	\item To rescue the duality, we have to squint at the induction principle and reformulate it in terms more amenable to being dualized -- we need to split it into a recursion principle and a uniqueness principle.
 	\item The recursion principle consists of the recursor \texttt{rec} and its computation rules: \\
-	\texttt{rec : forall X : Type, X -> (X -> X) -> nat -> X} \\
-	\texttt{rec\_eq1 : rec X z s 0 = z} \\
-	\texttt{rec\_eq2 : rec X z s (S n) = s (rec X z s n)}
+	\texttt{rec :\ forall X :\ Type, X -> (X -> X) -> nat -> X} \\
+	\texttt{rec\_eq1 :\ rec X z s 0 = z} \\
+	\texttt{rec\_eq2 :\ rec X z s (S n) = s (rec X z s n)}
 	\item The uniqueness principle looks like this: if a function \texttt{f} satisfies the equations \\
 	\texttt{f 0 = z} \\
 	\texttt{f (S n) = s (f n)} \\
-	for some \texttt{z : X} and \texttt{s : X -> X}, and a function \texttt{g} also satisfies them, then \texttt{forall x : X, f x = g x}.
+	for some \texttt{z :\ X} and \texttt{s :\ X -> X}, and a function \texttt{g} also satisfies them, then \texttt{forall x :\ X, f x = g x}.
 \end{itemize}
 \end{frame}
 
@@ -197,7 +197,7 @@
 \begin{itemize}
 	\item We can now state the coinduction principle (for conatural numbers) and see the duality in full glory.
 	\item The corecursion principle: there is a corecursor \\
-	\texttt{corec : forall X, (X -> option X) -> X -> conat} \\
+	\texttt{corec :\ forall X, (X -> option X) -> X -> conat} \\
 	and it satisfies some equations: \\
 	\texttt{pred (corec X p x) =\\
 	match p x with \\
@@ -205,7 +205,7 @@
 	| Some x' => Some (corec X p x') \\
 	end}
 	\item Given two functions \texttt{f} and \texttt{g} that satisfy the same corecursive equation as \texttt{corec X p}, we have \\
-	\texttt{forall x : X, f x = g x}.
+	\texttt{forall x :\ X, f x = g x}.
 \end{itemize}
 \end{frame}
 
@@ -231,7 +231,7 @@
 \begin{itemize}
 	\item The corecursion and uniqueness principles are independent too. When considered together, they can be thought of as the coinduction principle.
 	\item Therefore in Coq, because we only have the corecursion principle, we can't derive the uniqueness principle in any way.
-	\item How to prove \texttt{forall x : X, f x = g x}, for \texttt{f g : X -> C} and \texttt{C} coinductive?
+	\item How to prove \texttt{forall x :\ X, f x = g x}, for \texttt{f g :\ X -> C} and \texttt{C} coinductive?
 	\item Because the equality type is inductive, we can't use corecursion and because we don't know anything about \texttt{X}, we can't do anything with it either.
 	\item Therefore we are stuck without the uniqueness principle. In Coq, we can't prove bisimilar objects equal without assuming axioms.
 \end{itemize}
@@ -257,13 +257,13 @@
 
 \begin{frame}{W-types, M-types}
 \begin{itemize}
-	\item Another approach to adding inductives/coinductives are the so called W-types/M-types respectively.
+	\item Another approach to adding inductives/coinductives are the so called W-types/M-types, respectively.
 	\item The idea is to add a single parameterized type \texttt{W} whose elements are well-founded trees.
 	\item The parameters control the shape of the trees -- the branching, types of non-recursive arguments etc. Particular inductive types can be recovered by instantiating \texttt{W} with the appropriate parameters.
 	\item The type \texttt{M} is dual to \texttt{W} and can be used to represent coinductives. Its elements are possibly non-well-founded trees.
 	\item Pros: one ring to rule them all, simple to describe formally.
 	\item Cons: encodings using \texttt{W} and \texttt{M} have some overhead.
-	\item Cons: \texttt{W} and \texttt{M} are inherently higher-order, which means we need functional extensionality when doing equality proofs.
+	\item Cons: \texttt{W} and \texttt{M} are inherently higher-order, which means we need functional extensionality for equality proofs to go.
 \end{itemize}
 \end{frame}
 
