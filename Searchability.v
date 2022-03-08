@@ -46,9 +46,7 @@ Lemma sc_eq :
       if p zero then zero else succ (search_conat (fun n => p (succ n))).
 Proof.
   intros. apply eq_pred. cbn.
-  destruct (p zero) eqn: Hp.
-    cbn. reflexivity.
-    cbn. reflexivity.
+  destruct (p zero) eqn: Hp; cbn; reflexivity.
 Qed.
 
 CoInductive sim (n m : conat) : Prop :=
@@ -66,12 +64,12 @@ Proof.
   cofix CH.
   intros p H.
   constructor. cbn. destruct (p zero) eqn: Hp.
-    replace (search_conat p) with zero in H.
-      congruence.
-      apply eq_pred. cbn. rewrite Hp. reflexivity.
-    right. do 2 eexists. split; [idtac | split].
-      1-2: reflexivity.
-      apply CH. rewrite sc_eq, Hp in H. assumption.
+  - replace (search_conat p) with zero in H.
+    + congruence.
+    + apply eq_pred. cbn. rewrite Hp. reflexivity.
+  - right. do 2 eexists. split; [| split].
+    1-2: reflexivity.
+    apply CH. rewrite sc_eq, Hp in H. assumption.
 Qed.
 
 CoInductive le (n m : conat) : Prop :=
@@ -89,12 +87,12 @@ Proof.
   cofix CH.
   intros p n H.
   constructor. rewrite sc_eq. destruct (p zero) eqn: Hp.
-    left. cbn. reflexivity.
-    right. cbn. destruct n as [[n' |]].
-      Focus 2. unfold zero in Hp. congruence.
-      do 2 eexists; split; [idtac | split].
-        1-2: reflexivity.
-        apply CH. rewrite <- H. f_equal.
+  - left. cbn. reflexivity.
+  - right. cbn. destruct n as [[n' |]].
+    + do 2 eexists; split; [| split].
+      1-2: reflexivity.
+      apply CH. unfold succ. assumption.
+    + unfold zero in Hp. congruence.
 Qed.
 
 Lemma le_omega_l :
@@ -102,14 +100,14 @@ Lemma le_omega_l :
 Proof.
   cofix CH.
   intros n H. destruct H as [[|]].
-    cbn in H. inversion H.
-    destruct H as (omega' & n' & H1 & H2 & H3).
-      cbn in *. inversion H1. subst.
-      constructor. right. exists n', omega. cbn. split.
-        assumption.
-        split.
-          reflexivity.
-          apply CH. assumption.
+  - cbn in H. inversion H.
+  - destruct H as (omega' & n' & H1 & H2 & H3).
+    cbn in *; inversion H1; subst; clear H1.
+    constructor. right. exists n', omega. cbn.
+    split; [| split].
+    + assumption.
+    + reflexivity.
+    + apply CH. assumption.
 Qed.
 
 Axiom sim_eq :
@@ -121,14 +119,22 @@ Instance Searchable_conat : Searchable conat :=
     search := search_conat;
 }.
 Proof.
-  intro p. case (p (search_conat p)) eqn: H.
-    left. reflexivity.
-    right. intro n.
-      destruct (p n) eqn: Hpn.
-        2: reflexivity.
-        pose (Hpn' := Hpn). pose (H' := H).
-          apply sc_true in Hpn'. apply search_conat_spec in H'.
-          apply sim_eq in H'. rewrite H' in *.
-          apply le_omega_l in Hpn'. apply sim_eq in Hpn'. subst.
-          congruence.
+  intro p. destruct (p (search_conat p)) eqn: H; [left; reflexivity |].
+  right. intro n.
+  destruct (p n) eqn: Hpn; [| reflexivity].
+  assert (Heq : search_conat p = omega).
+  {
+    apply sim_eq.
+    apply search_conat_spec.
+    assumption.
+  }
+  assert (Heq' : n = omega).
+  {
+    apply sim_eq.
+    apply le_omega_l.
+    rewrite <- Heq.
+    apply sc_true.
+    assumption.
+  }
+  rewrite Heq in *; subst. congruence.
 Defined.
