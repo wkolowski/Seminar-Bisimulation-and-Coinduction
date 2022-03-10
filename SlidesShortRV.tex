@@ -2,7 +2,7 @@
 
 \title{Coinduction in type theory: a quick introduction}
 \author{Wojciech Kołowski}
-\date{8 March 2022}
+\date{March 2022}
 
 \usetheme{Darmstadt}
 
@@ -11,24 +11,29 @@
 \frame{\titlepage}
 \frame{\tableofcontents}
 
-\begin{frame}{Approaches to coinduction}
+\section{Approaches to coinduction}
+
+\begin{frame}{Approaches to coinduction 1/2}
 \begin{itemize}
 	\item There are quite a few approaches to coinduction:
 	\item The LTS approach (LTS is an abbreviation of ``labeled transition system''), in which coinductive processes are (re)presented using a particular kind of state machine.
-	\item The categorical approach, in which coinductively defined objects are represented as coalgebras of endofunctors.
-	\item The order-theoretic approach, which is a variant of the categorical approach.
-	\item The set-theoretic approach, 
+	\item The categorical approach, in which coinductively defined objects are represented as final coalgebras of endofunctors.
+	\item The order-theoretic approach, in which coinductive objects are represented as greatest fixed-points of monotone functions - this is a variant of the categorical approach.
+	\item You can find more about the history of the concept of coinduction in \href{https://dl.acm.org/doi/pdf/10.1145/1516507.1516510}{\color{blue}{On the Origins of Bisimulation and
+  Coinduction}}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Approaches to coinduction 2/2}
+\begin{itemize}
+	\item The above approaches are not very enlightening, arguably.
+	\item I think that the most natural way of explaining coinduction is to refer to an informal version of the duality with induction, explain it in depth and then present lots of examples and exercises to build the right intuitions. We will do just that!
+  \item But we don't want to hand-weave ourselves to death, so later we will see how coinduction works in type theory, particularly in the Coq proof assistant.
+  \item These slides are a shortened version of \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction/blob/master/Slides.pdf} -- see there for a critique of other approaches to coinduction and for an interesting connection between coinduction and topology.
 \end{itemize}
 \end{frame}
 
 \section{An intuitive approach to coinduction}
-
-\begin{frame}{How to explain coinduction to 5 year olds}
-\begin{itemize}
-	\item I think that the most natural way of explaining coinduction is to refer to an informal version of the duality with induction, explain it in depth and then present lots of examples and exercises to build the right intuitions.
-	\item So, let's do just that! 
-\end{itemize}
-\end{frame}
 
 \begin{frame}{The duality}
 \begin{tabular}{ | p{3cm} | p{3cm} | p{3cm} | }
@@ -48,20 +53,11 @@
 \begin{frame}{A comparatory example}
 \begin{itemize}
 	\item How does the duality play out in practice? Let's see an example in Coq!
-	\item The code snippet with the example is available from the GitHub repo of this talk: \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction/blob/master/Duality.v}
+	\item The code snippet with the example is available from the GitHub repo of this talk: \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction/blob/master/Duality.v} (beware: no comments in the code).
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Explaining the first half of the duality}
-\begin{itemize}
-	\item The first half of the table can be restated in terms of category theory and logic/type theory.
-	\item In categorical terms it means that inductives have a ``mapping-out'' universal property, i.e. they are colimits, whereas coinductives have a ``mapping-in'' universal property, i.e. they are limits.
-	\item In logical terms, we can say that inductives have positive polarity and coinductives have negative polarity. For nice explanations of polarity, see \url{https://existentialtype.wordpress.com/2012/08/25/polarity-in-type-theory/} and \url{http://noamz.org/talks/logpolpro.pdf}.
-	\item All of this can also be restated in less scary terms.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{(Co)induction, (co)limits, positive and negative types 1/2}
+\begin{frame}{Explaining the first half of the duality 1/2}
 \begin{itemize}
 	\item Inductives are determined by ways of constructing their elements and the elimination principle is a derived notion whose purpose is to say ``the only things you can build come from the introduction principles (constructors)''.
 	\item Coinductives are determined by ways of observing their elements and the introduction principle is a derived notion whose purpose is to say ``the only things you can observe come from the elimination principles''.
@@ -69,7 +65,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{(Co)induction, (co)limits, positive and negative types 2/2}
+\begin{frame}{Explaining the first half of the duality 2/2}
 \begin{itemize}
 	\item The type \texttt{bool} is an inductive type with two constructors \texttt{true} and \texttt{false}. Knowing this we can derive an elimination principle, which amounts to an \texttt{if-then-else} expression (but dependently typed!).
 	\item Imagine a type of web servers that can only handle requests for pictures of funny cats (this is the elimination principle). From this description we know that there must be something in the web server that is responsible for handling these requests and thus the derived introduction principle specifies all the possible ways of constructing that thing.
@@ -103,9 +99,10 @@
 
 \begin{frame}{Lazines and strictness 3/3}
 \begin{itemize}
-	\item \textbf{Laziness and strictness are properties of types, not of languages}
+	\item \textbf{Laziness and strictness are best thought of as properties of types, not of languages}
 	\item Haskell is usually said to be a ``lazy language'', but in reality it's just that its types are lazy by default. Given some strictness annotations we can define strict types or even mixed strict-lazy types.
 	\item OCaml or StandardML are usually said to be ``strict'' languages, but it's just that their types are strict by default. We can make the type \texttt{'a} lazy by turning it into a function type with unit domain: \texttt{unit -> 'a}.
+	\item In Coq, inductive types are best thought of as strict, whereas coinductive types are best thought of as lazy.
 \end{itemize}
 \end{frame}
 
@@ -123,10 +120,10 @@
 \begin{itemize}
 	\item \textbf{The term ``infinite loop'' is considered harmful, because it conflates two separate notions: termination and productivity.}
 	\item Termination is a property that pertains only to recursive functions.
-	\item Each recursive call must shrink the input and may produce a part of the output.
+	\item In Type Theory and Coq, each recursive call must shrink the input and may produce a part of the output.
 	\item Therefore all recursive functions terminate.
 	\item Productivity is a property that pertains only to corecursive functions.
-	\item Each corecursive call may do anything with the input and must produce a part of the output.
+	\item In Type Theory and Coq, each corecursive call may do anything with the input and must produce a part of the output.
 	\item Therefore all corecursive functions are productive.
 \end{itemize}
 \end{frame}
@@ -143,13 +140,23 @@
 
 \section{Coinduction in type theory}
 
-\begin{frame}{A closer look at the duality}
+\begin{frame}{A closer look at the duality 1/2}
 \begin{itemize}
 	\item Earlier we said that for an inductive type $I$ it's easy to define functions of type $I \to X$, whereas for a coinductive type $C$ it's easy to define functions $X \to C$.
-	\item The induction principle for \texttt{nat} looks like this (in Coq): \texttt{forall P :\ nat -> Type, \\ P 0 -> (forall n :\ nat, P n -> P (S n)) -> \\ forall n :\ nat, P n}
-	\item The corecursion principle for \texttt{conat} looks like this (in Coq): \texttt{forall X :\ Type, (X -> option X) -> X -> conat}
-	\item The first trouble lies in names: ``induction principle'' vs ``corecursion principle''. Where is the coinduction principle?
-	\item The second trouble lies in the strong assymmetry between the two principles: they look nothing like each other's mirror images.
+	\item To define functions $I \to X$, we use the elimination principle, which for inductive types is called the induction principle.
+	\item To define functions of type $X \to C$, we use the introduction principle, which for coinductive types is called the corecursion principle.
+	\item There are two troubles with this part of the duality.
+  \item The first trouble lies in names: ``induction principle'' vs ``corecursion principle''. Where is the coinduction principle?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{A closer look at the duality 2/2}
+\begin{itemize}
+  \item As our running example of $I$, we will use $\texttt{nat}$, the natural numbers.
+  \item As our running example of $C$, we will use $\texttt{conat}$, the conatural numbers (see \href{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction/blob/master/Duality.v}{\color{blue}{here}} for the definition).
+  \item The induction principle for \texttt{nat} looks like this (in Coq): \texttt{forall P :\ nat -> Type, \\ P 0 -> (forall n :\ nat, P n -> P (S n)) -> \\ forall n :\ nat, P n}
+  \item The corecursion principle for \texttt{conat} looks like this (in Coq): \texttt{forall X :\ Type, (X -> option X) -> X -> conat}
+  \item The second trouble with the duality lies in the strong assymmetry between the two principles: they look nothing like each other's mirror images.
 \end{itemize}
 \end{frame}
 

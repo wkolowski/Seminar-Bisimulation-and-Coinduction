@@ -132,6 +132,7 @@
 	\item \textbf{Laziness and strictness are properties of types, not of languages}
 	\item Haskell is usually said to be a ``lazy language'', but in reality it's just that its types are lazy by default. Given some strictness annotations we can define strict types or even mixed strict-lazy types.
 	\item OCaml or StandardML are usually said to be ``strict'' languages, but it's just that their types are strict by default. We can make the type \texttt{'a} lazy by turning it into a function type with unit domain: \texttt{unit -> 'a}.
+	\item In Coq, inductive types are best thought of as strict, whereas coinductive types are best thought of as lazy.
 \end{itemize}
 \end{frame}
 
