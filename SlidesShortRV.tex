@@ -111,7 +111,7 @@
 	\item In programmers' collective consciousness there is the term ``infinite loop'', usually applied to describe two kinds of programs.
 	\item The first kind looks like \texttt{while(true) $\lbrace$...$\rbrace$}. In such cases the ``infinite loop'' was programmed intentionally. Its purpose may be to, for example, implement a server that is waiting for requests.
 	\item The second kind looks like an ordinary loop, but the stopping condition will never be met. In such cases the ``infinite loop'' was programmed by mistake and thus is a bug.
-	\item This term would also be applied to describe an erroneous implementation of recursive factorial on integers with the base case missing, even though there isn't any kind of loop going on.
+	\item This term would also be applied to describe an erroneous implementation of recursive factorial on integers with the base case missing, even though no loop was used there.
 	\item Note that this term is very one-sided -- terminating programs aren't called ``finite loops''.
 \end{itemize}
 \end{frame}
@@ -120,10 +120,10 @@
 \begin{itemize}
 	\item \textbf{The term ``infinite loop'' is considered harmful, because it conflates two separate notions: termination and productivity.}
 	\item Termination is a property that pertains only to recursive functions.
-	\item In Type Theory and Coq, each recursive call must shrink the input and may produce a part of the output.
+	\item In Coq and type theory, each recursive call must shrink the input and may produce a part of the output.
 	\item Therefore all recursive functions terminate.
 	\item Productivity is a property that pertains only to corecursive functions.
-	\item In Type Theory and Coq, each corecursive call may do anything with the input and must produce a part of the output.
+	\item In Coq and type theory, each corecursive call may do anything with the input and must produce a part of the output.
 	\item Therefore all corecursive functions are productive.
 \end{itemize}
 \end{frame}
@@ -160,33 +160,47 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{A different look at the induction principle}
+\begin{frame}{A different look at the induction principle 1/2}
 \begin{itemize}
 	\item To rescue the duality, we have to squint at the induction principle and reformulate it in terms more amenable to being dualized -- we need to split it into a recursion principle and a uniqueness principle.
-	\item The recursion principle consists of the recursor \texttt{rec} and its computation rules: \\
+	\item The recursion principle states that there is a function (called the recursor) \\
 	\texttt{rec :\ forall X :\ Type, X -> (X -> X) -> nat -> X} \\
-	\texttt{rec\_eq1 :\ rec X z s 0 = z} \\
-	\texttt{rec\_eq2 :\ rec X z s (S n) = s (rec X z s n)}
-	\item The uniqueness principle looks like this: if a function \texttt{f} satisfies the equations \\
-	\texttt{f 0 = z} \\
-	\texttt{f (S n) = s (f n)} \\
-	for some \texttt{z :\ X} and \texttt{s :\ X -> X}, and a function \texttt{g} also satisfies them, then \texttt{forall x :\ X, f x = g x}.
+  which for all \texttt{X :\ Type}, \texttt{z :\ X} and \texttt{s :\ X -> X} \\
+  satisfies the following equations definitionally: \\
+	\texttt{rec X z s 0 $\equiv$ z} \\
+	\texttt{rec X z s (S n) $\equiv$ s (rec X z s n)} \\
 \end{itemize}
 \end{frame}
 
-\begin{frame}{The coinduction principle}
+\begin{frame}{A different look at the induction principle 2/2}
+\begin{itemize}
+	\item The uniqueness principle is as follows. Given \texttt{X :\ Type} and two functions \texttt{f :\ nat -> X} and \texttt{g :\ nat -> X}, if for all \texttt{z :\ X} and \texttt{s :\ X -> X} they satisfy the same equations as \texttt{rec X z s} (but this time propositionally, i.e. using \texttt{=} instead of $\equiv$), then \texttt{forall n :\ nat, f n = g n}.
+  \item An alternative formulation, which involves only a single function, is as follows: if \texttt{f :\ nat -> X} satisfies the same equations as \texttt{rec X z s}, then \\
+  \texttt{forall n :\ nat, f n = rec X z s n}.
+  \item We could also formulate variants of the uniqueness principle that uses $\equiv$ instead of \texttt{=}, but this is a very confusing territory, so we won't discuss it'll omit it.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The coinduction principle 1/2}
 \begin{itemize}
 	\item We can now state the coinduction principle (for conatural numbers) and see the duality in full glory.
-	\item The corecursion principle: there is a corecursor \\
+	\item The corecursion principle states that there is a function (called the corecursor) \\
 	\texttt{corec :\ forall X, (X -> option X) -> X -> conat} \\
-	and it satisfies some equations: \\
-	\texttt{pred (corec X p x) =\\
+  which for all \texttt{X :\ Type} and \texttt{p :\ X -> option X} \\
+  satisfies the following equation definitionally: \\
+	\texttt{pred (corec X p x) $\equiv$ \\
 	match p x with \\
 	| None => None \\
 	| Some x' => Some (corec X p x') \\
 	end}
-	\item Given two functions \texttt{f} and \texttt{g} that satisfy the same corecursive equation as \texttt{corec X p}, we have \\
-	\texttt{forall x :\ X, f x = g x}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The coinduction principle 2/2}
+\begin{itemize}
+	\item The uniqueness principle is as follows. Given \texttt{X :\ Type} and two functions \texttt{f :\ X -> conat} and \texttt{g :\ X -> conat}, if for all \texttt{p :\ X -> option X} they satisfy the same equations as \texttt{corec X p} (but this time propositionally, i.e. using \texttt{=} instead of $\equiv$), then \texttt{forall x :\ X, f x = g x}.
+  \item An alternative formulation: if \texttt{f :\ X -> conat} satisfies the same equations as \texttt{corec X p}, then \\
+  \texttt{forall x :\ X, f x = corec X p x}.
 \end{itemize}
 \end{frame}
 
@@ -220,7 +234,7 @@
 
 \begin{frame}{How to add (co)inductive types to type theory?}
 \begin{itemize}
-	\item We saw in earlier talks that in set theory, coinductive definitions are not a basic concept and have to be derived from the ZF axioms. Inductives aren't basic either.
+	\item In set theory, coinductive definitions are not a basic concept and have to be derived from the axioms. Inductives aren't basic either.
 	\item What's the situation in Coq and type theory in general?
 	\item There are three approaches that I'm aware of: schematic definitions, W-types/M-types and universes of codes.
 \end{itemize}
@@ -244,7 +258,7 @@
 	\item The type \texttt{M} is dual to \texttt{W} and can be used to represent coinductives. Its elements are possibly non-well-founded trees.
 	\item Pros: one ring to rule them all, simple to describe formally.
 	\item Cons: encodings using \texttt{W} and \texttt{M} have some overhead.
-	\item Cons: \texttt{W} and \texttt{M} are inherently higher-order, which means we need functional extensionality for equality proofs to go.
+	\item Cons: \texttt{W} and \texttt{M} are inherently higher-order, which means we need functional extensionality for equality proofs to go through.
 \end{itemize}
 \end{frame}
 
@@ -264,82 +278,12 @@
 \end{itemize}
 \end{frame}
 
-\section{Finite, infinite and searchable types}
+\section{Exercises}
 
-\begin{frame}{Drinker's paradox}
+\begin{frame}{Exercises}
 \begin{itemize}
-	\item There's this well-known theorem of classical logic:
-	\item \textbf{In every non-empty bar, there is a person such that if this person drinks, then everybody drinks.}
-	\item This is usually presented to first-year students to make them confuse if-then implication with if-then causality.
-	\item If we rewrite $P \to Q$ as $\neg P \lor Q$, the theorem gets demystified: \textbf{in every non-empty bar there is a person that does not drink or everybody drinks.}
-	\item An algorithmically-minded person might wonder: how to find the non-drinker? Is it even possible? After all, the bar may be infinite!
-	\item But remember that we are using classical logic -- we can find him using the Law of Excluded Middle.
-	\item How does this translate to constructive logic and functional programming?
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Searchable types}
-\begin{center}
-	$\displaystyle \texttt{Searchable}(A) :\equiv \prod_{p : A \to \mathbf{2}} \left(\sum_{x : A} p(x) = true\right) + \left(\prod_{x : A} p(x) = false\right)$
-\end{center}
-\begin{itemize}
-	\item A type that satisfies the drinker's paradox statement is called \textbf{searchable}.
-	\item Spelled out explicitly: a type is searchable if, given any boolean predicate, we can either find an element that satisfies it or prove that there is no such element.
-	\item Drinker's Paradox says that in classical logic all types are searchable. But which types are searchable constructively?
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Interlude: why should we care?}
-\begin{itemize}
-	\item Maybe you're wondering why you should care about searchable types.
-	\item Besides their evident utility when you're looking for something, there's a very nice theorem that may convince you.
-\end{itemize}
-\begin{theorem}
-	Let $A$ and $B$ be types. If $A$ is searchable and $B$ has decidable equality, then the function type $A \to B$ has decidable equality.
-\end{theorem}
-\begin{proof}
-	We have $f, g : A \to B$. To decide whether $f = g$ just search the domain $A$ for an $x : A$ that satisfies $f(x) \neq g(x)$. If you find one, $f \neq g$. Otherwise, $f = g$ (assuming functional extensionality)
-\end{proof}
-\end{frame}
-
-\begin{frame}{Which types are searchable?}
-\begin{itemize}
-	\item So, which types are searchable?
-	\item Certainly every finite type is searchable -- just check every element.
-	\item If $A$ and $B$ are searchable, so are $A + B$ and $A \times B$.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Which types are not searchable?}
-\begin{itemize}
-	\item On the other hand, there are some types which should not be searchable, unless we assume excluded middle.
-	\item The most prominent such type is $\mathbb{N}$. We should have a strong feeling that it's impossible to search its infinitely many elements in finite time.
-	\item So, without excluded middle we can't prove that infinite types are searchable, right?
-	\item \textbf{Yes, we can (sometimes).}
-	\item Whether a type is searchable depends not only on the number of elements, but also on how the type is laid out as a space.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Searchability of the conaturals}
-\begin{itemize}
-	\item The most prominent infinite type that is searchable are the conatural numbers (like natural numbers, but defined coinductively).
-	\item The snippet with a Coq proof of their searchability is \url{https://github.com/wkolowski/Seminar-Bisimulation-and-Coinduction/blob/master/Searchability.v}.
-	\item It is based on the paper \url{https://www.cs.bham.ac.uk/~mhe/papers/omniscient-journal-revised.pdf}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Exercises 1/2}
-\begin{itemize}
-	\item Ex. 1: remove the axiom \texttt{sim\_eq} from my Coq proof of searchability of the conaturals and prove a lemma to fill the hole.
-	\item Ex. 2: define a type of streams, its bisimilarity relation and its corecursion principle. Then prove that the uniqueness principle implies that bisimilar streams are equal.
-	\item Ex. 3: define the bisimilarity relation of \texttt{M}-types. Encode streams using \texttt{M}-types. Prove that the types of normal streams and \texttt{M}-encoded streams are isomorphic (i.e. there are functions going both ways, such that the composition result is bisimilar to the argument).
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Exercises 2/2}
-\begin{itemize}
-	\item Ex. 4: for a type $A$ its subtypes can be represented by the type $\displaystyle \sum_{x : A} P(x)$ where $P : A \to \text{Prop}$ is a predicate. Are subtypes of searchable types searchable? If yes, give a Coq proof. If not, give a counterexample and find a different notion of subtype for which subtypes of searchable types are searchable.
-	\item Grading: all or nothing. These exercises were designed to look very scary but in fact they are very easy :)
+	\item The best way to learn coinduction is by using it.
+	\item As an exercise, try to develop the theory of conatural numbers.
 \end{itemize}
 \end{frame}
 
