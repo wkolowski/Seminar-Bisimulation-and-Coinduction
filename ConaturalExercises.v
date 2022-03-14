@@ -724,11 +724,7 @@ Admitted.
 (** Define the function [from_nat] which transforms a natural number into its
     corresponding conatural number. *)
 
-Fixpoint from_nat (n : nat) : conat :=
-match n with
-    | 0 => zero
-    | Datatypes.S n' => succ (from_nat n')
-end.
+Axiom from_nat : nat -> conat.
 
 Lemma Finite_from_nat :
   forall n : nat, Finite (from_nat n).
