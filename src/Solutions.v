@@ -161,9 +161,9 @@ Lemma gg_ff :
     siM (ff (gg s)) s.
 Proof.
   cofix CH.
-  econstructor. Unshelve.
-    Focus 2. cbn. reflexivity.
-    destruct p. cbn. apply CH.
+  unshelve econstructor; [easy |].
+  destruct p; cbn.
+  now apply CH.
 Qed.
 
 End Ex3.

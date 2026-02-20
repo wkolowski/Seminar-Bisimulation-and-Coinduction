@@ -1,4 +1,11 @@
-*.aux
+**.glob
+**.aux
+**.vo
+**.vok
+**.vos
+
+**~
+
 *.log
 *.nav
 *.out
@@ -10,3 +17,13 @@
 *vrb
 *.synctex(busy)
 _minted-Slides
+
+.coqdeps.d
+.makefile.d
+makefile
+makefile.conf
+
+.vscode
+.lia.cache
+
+result
