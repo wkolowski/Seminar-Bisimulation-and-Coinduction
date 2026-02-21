@@ -23,14 +23,14 @@ Abort.
 (** * W-types and M-types *)
 
 Inductive W (A : Type) (B : A -> Type) : Type :=
-    | sup : forall x : A, (B x -> W A B) -> W A B.
+| sup : forall x : A, (B x -> W A B) -> W A B.
 
 Arguments sup {A B} _ _.
 
 CoInductive M (S : Type) (P : S -> Type) : Type :=
 {
-    shape : S;
-    position : P shape -> M S P
+  shape : S;
+  position : P shape -> M S P
 }.
 
 Arguments shape {S P} _.

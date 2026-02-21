@@ -1,8 +1,6 @@
+From BisimCoind Require Import Searchability.
+
 (*
-Require Import Searchability.
-
-Ltac inv H := inversion H; subst.
-
 Lemma no_axiom :
   forall n m : conat,
     sim n omega -> le n m -> sim m omega.
@@ -22,7 +20,7 @@ Proof.
             destruct Hsim as [[]].
               destruct H. congruence.
               destruct H as (n'' & m'' & H1' & H2' & H3').
-                cbn in H2'. inv H2'. rewrite H1' in H1. inv H1.
+                cbn in H2'. injection H2' as [= ->]. rewrite H1' in H1. injection H1 as [= ->].
                   assumption.
             assumption.
 Qed.
@@ -32,8 +30,8 @@ Module Ex2.
 
 CoInductive Stream (A : Type) : Type :=
 {
-    hd : A;
-    tl : Stream A;
+  hd : A;
+  tl : Stream A;
 }.
 
 Arguments hd {A} _.
@@ -41,45 +39,42 @@ Arguments tl {A} _.
 
 CoInductive sim {A : Type} (s1 s2 : Stream A) : Prop :=
 {
-    hds : hd s1 = hd s2;
-    tls : sim (tl s1) (tl s2);
+  hds : hd s1 = hd s2;
+  tls : sim (tl s1) (tl s2);
 }.
 
-CoFixpoint corec
-  {A X : Type} (h : X -> A) (t : X -> X) (x : X) : Stream A :=
+CoFixpoint corec {A X : Type} (h : X -> A) (t : X -> X) (x : X) : Stream A :=
 {|
-    hd := h x;
-    tl := corec h t (t x);
+  hd := h x;
+  tl := corec h t (t x);
 |}.
 
 Fixpoint nth {A : Type} (s : Stream A) (n : nat) : A :=
 match n with
-    | 0 => hd s
-    | S n' => nth (tl s) n'
+| 0 => hd s
+| S n' => nth (tl s) n'
 end.
 
 Fixpoint drop {A : Type} (s : Stream A) (n : nat) : Stream A :=
 match n with
-    | 0 => s
-    | S n' => drop (tl s) n'
+| 0 => s
+| S n' => drop (tl s) n'
 end.
 
 Lemma hd_drop :
   forall {A : Type} (n : nat) (s : Stream A),
     hd (drop s n) = nth s n.
 Proof.
-  induction n as [| n']; cbn; intros.
-    reflexivity.
-    rewrite IHn'. reflexivity.
+  induction n as [| n']; cbn; intros; [easy |].
+  now rewrite IHn'.
 Qed.
 
 Lemma tl_drop :
   forall {A : Type} (n : nat) (s : Stream A),
     tl (drop s n) = drop s (S n).
 Proof.
-  induction n as [| n']; cbn; intros.
-    reflexivity.
-    rewrite IHn'. cbn. reflexivity.
+  induction n as [| n']; cbn; intros; [easy |].
+  now rewrite IHn'; cbn.
 Qed.
 
 Lemma uniqueness_sim_is_eq :
@@ -91,14 +86,12 @@ Lemma uniqueness_sim_is_eq :
     forall s1 s2 : Stream A, sim s1 s2 -> s1 = s2.
 Proof.
   intros A H s1 s2 Hsim.
-  eapply (H nat (drop s1) (drop s2) (nth s1) S _ _ 0).
-  Unshelve.
-    split; [apply hd_drop | apply tl_drop].
-    split.
-      2: apply tl_drop.
-      revert s1 s2 Hsim. induction x as [| n']; cbn; intros.
-        destruct Hsim. rewrite hds0. reflexivity.
-        destruct Hsim. rewrite (IHn' _ _ Hsim). reflexivity.
+  unshelve eapply (H nat (drop s1) (drop s2) (nth s1) S _ _ 0).
+  - now split; [apply hd_drop | apply tl_drop].
+  - split; [| now apply tl_drop].
+    revert s1 s2 Hsim.
+    induction x as [| n']; cbn; intros s1 s2 []; [easy |].
+    now erewrite IHn'.
 Qed.
 
 End Ex2.
@@ -116,18 +109,17 @@ CoInductive M (S : Type) (P : S -> Type) : Type :=
 Arguments shape {S P}.
 Arguments position {S P} _ _.
 
-Definition transport
-  {A : Type} {P : A -> Type} {x y : A} (p : x = y) (u : P x) : P y :=
+Definition transport {A : Type} {P : A -> Type} {x y : A} (p : x = y) (u : P x) : P y :=
 match p with
-    | eq_refl => u
+| eq_refl => u
 end.
 
 CoInductive siM {S : Type} {P : S -> Type} (m1 m2 : M S P) : Prop :=
 {
-    shapes : shape m1 = shape m2;
-    positions :
-      forall p : P (shape m1),
-        siM (position m1 p) (position m2 (transport shapes p))
+  shapes : shape m1 = shape m2;
+  positions :
+    forall p : P (shape m1),
+      siM (position m1 p) (position m2 (transport shapes p))
 }.
 
 Definition P_Stream (A : Type) : A -> Type := fun _ => unit.
@@ -136,14 +128,14 @@ Definition Stream' (A : Type) : Type := M A (P_Stream A).
 
 CoFixpoint ff {A : Type} (s : Stream A) : Stream' A :=
 {|
-    shape := hd s;
-    position _ := ff (tl s);
+  shape := hd s;
+  position _ := ff (tl s);
 |}.
 
 CoFixpoint gg {A : Type} (s : Stream' A) : Stream A :=
 {|
-    hd := shape s;
-    tl := gg (position s tt);
+  hd := shape s;
+  tl := gg (position s tt);
 |}.
 
 Lemma ff_gg :
@@ -151,9 +143,8 @@ Lemma ff_gg :
     sim (gg (ff s)) s.
 Proof.
   cofix CH.
-  constructor; cbn.
-    reflexivity.
-    apply CH.
+  constructor; cbn; [easy |].
+  now apply CH.
 Qed.
 
 Lemma gg_ff :
@@ -162,7 +153,7 @@ Lemma gg_ff :
 Proof.
   cofix CH.
   unshelve econstructor; [easy |].
-  destruct p; cbn.
+  intros []; cbn.
   now apply CH.
 Qed.
 
