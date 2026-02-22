@@ -1,30 +1,13 @@
 From BisimCoind Require Import Searchability.
 
+Module Ex1.
+
 (*
-Lemma no_axiom :
-  forall n m : conat,
-    sim n omega -> le n m -> sim m omega.
-Proof.
-  cofix CH.
-  intros n m Hsim Hle.
-  destruct Hle as [[]].
-    destruct Hsim as [[]].
-      destruct H0. inversion H1.
-      destruct H0 as (n' & m' & H1 & H2). congruence.
-    destruct H as (n' & m' & H1 & H2 & H3).
-      constructor. right. exists m', omega. split.
-        assumption.
-        split.
-          cbn. reflexivity.
-          apply CH with n'.
-            destruct Hsim as [[]].
-              destruct H. congruence.
-              destruct H as (n'' & m'' & H1' & H2' & H3').
-                cbn in H2'. injection H2' as [= ->]. rewrite H1' in H1. injection H1 as [= ->].
-                  assumption.
-            assumption.
-Qed.
+  Sadly, it's not possible to do it without the axiom. Neither is it possible
+  in the original Escardó definition that uses monotone sequences of booleans.
 *)
+
+End Ex1.
 
 Module Ex2.
 
