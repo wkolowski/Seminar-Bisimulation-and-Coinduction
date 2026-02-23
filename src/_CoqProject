@@ -1,0 +1,4 @@
+-R . BisimCoind
+-arg "-async-proofs-j 6"
+-arg "-async-proofs-cache force"
+-arg "-async-proofs-command-error-resilience off"
